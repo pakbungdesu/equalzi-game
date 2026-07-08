@@ -10,7 +10,7 @@ export default function App() {
     const [gameActive, setGameActive] = useState(true)
     const buttonRef = useRef(null)
 
-    const [windowSize, setWindowSize] = useState({
+    const [windowSize] = useState({
         width: typeof window !== "undefined" ? window.innerWidth : 400,
         height: typeof window !== "undefined" ? window.innerHeight : 400,
     })
