@@ -5,7 +5,6 @@ Equalzi is a fast-paced, addictive React-based dice game inspired by Tenzies, bu
 ---
 
 ## 🚀 Live Demo
-*(Optional: Add your deployed site link here)*
 - **Play Here:** [Live Link](https://equalzi.netlify.app/)
 
 ---
