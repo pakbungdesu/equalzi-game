@@ -7,7 +7,8 @@ export default function App() {
     const [dice, setDice] = useState(() => generateAllNewDice())
     const [rollSum, setRollSum] = useState(Math.floor(Math.random() * 10) + 29)
     const [timeLeft, setTimeLeft] = useState(20) 
-    const [gameActive, setGameActive] = useState(true)
+    const [gameActive, setGameActive] = useState(false)
+    const [hasStarted, setHasStarted] = useState(false)
     const buttonRef = useRef(null)
 
     const [windowSize] = useState({
@@ -37,10 +38,15 @@ export default function App() {
     }, [timeLeft, gameWon, gameActive])
 
     useEffect(() => {
-        if (gameWon || timeLeft === 0) {
-            buttonRef.current.focus()
+        if (gameWon || (hasStarted && !gameActive)) {
+            buttonRef.current?.focus()
         }
-    }, [gameWon, timeLeft])
+    }, [gameWon, gameActive, hasStarted])
+
+    function startGame() {
+        setHasStarted(true)
+        setGameActive(true)
+    }
 
     function generateAllNewDice() {
         return new Array(10)
@@ -92,7 +98,7 @@ export default function App() {
     // Determine what text to show on the main action button
     let buttonText = "Roll"
     if (gameWon) buttonText = "New Game"
-    if (!gameActive && !gameWon) buttonText = "Try Again"
+    if (hasStarted && !gameActive && !gameWon) buttonText = "Try Again"
 
     return (
         <main>
@@ -103,31 +109,47 @@ export default function App() {
                     style={{ position: "fixed", top: 0, left: 0, zIndex: 100 }} 
                 />
             )}
-            <div aria-live="polite" className="sr-only">
-                {gameWon && <p>Congratulations! You won! Press "New Game" to start again.</p>}
-                {!gameActive && <p>Time's up! Press "Try Again" to restart.</p>}
-            </div>
             
             <h1 className="title">Equalzi</h1>
             
-            {/* Display the timer status */}
-            <div className="game-status">
-                <p className="instructions">Roll until held dice equal: <strong>{rollSum}</strong></p>
-                <p className="timer">
-                    Time Remaining: <strong>{timeLeft}s</strong>
-                </p>
-            </div>
+            {!hasStarted ? (
+                <>
+                    <p className="start-instructions">Roll until held dice equal the target sum before time runs out! 🕙💨</p>
+                    <button className="game-control" onClick={startGame}>
+                        Start Game
+                    </button>
+                </>
+            ) : (
+                <>
+                    {gameActive && !gameWon &&                     
+                        <div className="game-status">
+                            <p className="instructions">Roll until held dice equal: <strong>{rollSum}</strong></p>
+                            <p className="timer">
+                                Time Remaining: <strong>{timeLeft}s</strong>
+                            </p>
+                        </div>
+                    }
 
-            {gameWon && <h2 className="win-message">🎉 You Won! Amazing job! 🎉</h2>}
-            {!gameActive && !gameWon && <h2 className="game-over">Time's Up! 😢</h2>}
+                    {gameWon && 
+                        <div className="game-status">
+                            <p className="win-message">You Won! Press "New Game" to start again. ✨</p>
+                        </div>
+                    }
+                    {!gameActive && !gameWon && 
+                        <div className="game-status">
+                            <p className="game-over">Time's Up! Press "Try Again" to restart. 😥</p>
+                        </div>
+                    }
 
-            <div className="dice-container">
-                {diceElements}
-            </div>
-            
-            <button ref={buttonRef} className="roll-dice" onClick={rollDice}>
-                {buttonText}
-            </button>
+                    <div className="dice-container">
+                        {diceElements}
+                    </div>
+                    
+                    <button ref={buttonRef} className="game-control" onClick={rollDice}>
+                        {buttonText}
+                    </button>
+                </>
+            )}
         </main>
     )
 }
